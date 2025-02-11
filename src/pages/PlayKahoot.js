@@ -10,7 +10,7 @@ const PlayKahoot = ({ user }) => {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
-    axios.get(`http://127.0.0.1:8000/api/quizzes/${gameId}/`, {
+    axios.get(`http://127.0.0.1:8000/play/${gameId}/`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('access')}` }
     })
       .then(response => setQuestions(response.data.questions))
