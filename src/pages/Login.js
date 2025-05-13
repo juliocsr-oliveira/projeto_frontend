@@ -10,7 +10,7 @@ const Login = ({ setUser }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login/', { email, password });
+      const response = await axios.post('http://127.0.0.1:8000/api/account/login/', { email, password });
       localStorage.setItem('access', response.data.access);
       localStorage.setItem('refresh', response.data.refresh);
       axios.get('http://127.0.0.1:8000/api/auth/user/', {
