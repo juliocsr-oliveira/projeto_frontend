@@ -16,11 +16,9 @@ const Register = ({ setUser }) => {
       return;
     }
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/account/register/', { username, email, password });
-      localStorage.setItem('access', response.data.access);
-      localStorage.setItem('refresh', response.data.refresh);
+      const response = await axios.post('http://127.0.0.1:8000/api/account/register/', { username, email, password1: password, password2: confirmPassword });
+      navigate ('/login')
       setUser({ username, email }); // Define o usuário com os dados do registro
-      navigate('/');
     } catch (error) {
       alert('Erro ao registrar! Verifique os dados inseridos.');
     }

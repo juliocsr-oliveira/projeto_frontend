@@ -2,50 +2,39 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const getCSRFToken = () => {
-  const cookieValue = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('csrftoken='))
-    ?.split('=')[1];
-  return cookieValue || '';
-};
-
 const Login = ({ setUser }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const csrfToken = getCSRFToken(); // ✅ Pegando CSRF Token
-
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:8000/api/login/',
-        { email, password },
-        {
-          headers: {
-            'X-CSRFToken': csrfToken,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true, // ✅ Permite envio de cookies
-        }
-      );
+      // 1. Login (token JWT)
+      const response = await axios.post('http://127.0.0.1:8000/api/account/login/', { username, password });
 
       localStorage.setItem('access', response.data.access);
       localStorage.setItem('refresh', response.data.refresh);
-      
-      // ✅ Buscando usuário autenticado
-      const userResponse = await axios.get('http://127.0.0.1:8000/api/auth/user/', {
-        headers: { Authorization: `Bearer ${response.data.access}` },
-        withCredentials: true,
+
+      // 2. Busca do usuário logado com token
+      const userRes = await axios.get('http://127.0.0.1:8000/api/account/auth/user/', {
+        headers: { Authorization: `Bearer ${response.data.access}` }
       });
-      
-      setUser(userResponse.data);
-      navigate('/');
+
+      const userData = userRes.data;
+      console.log("✅ Usuário carregado:", userData);
+
+      if (!userData.id) {
+        alert('Erro: usuário logado sem ID. Verifique o back-end.');
+        return;
+      }
+
+      setUser(userData);
+      navigate('/tela_usuario'); // Corrigido para underscore se for assim no seu routes
+
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
       alert('Erro ao fazer login! Verifique suas credenciais.');
+      console.error('Erro no login:', error);
     }
   };
 
@@ -55,10 +44,10 @@ const Login = ({ setUser }) => {
         <h1 className="text-3xl font-bold text-[#022894] text-center mb-6">Login</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <input
-            type="email"
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Nome de usuário"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full p-2 border rounded-lg"
             required
           />
@@ -73,16 +62,10 @@ const Login = ({ setUser }) => {
           <button type="submit" className="bg-[#022894] text-white w-full py-2 rounded-lg">Entrar</button>
         </form>
         <p className="text-center mt-4 text-sm text-gray-600">
-          Esqueceu a senha?{' '}
-          <span className="text-[#022894] cursor-pointer" onClick={() => navigate('/forgot-password')}>
-            Redefina sua senha
-          </span>
+          Esqueceu a senha? <span className="text-[#022894] cursor-pointer" onClick={() => navigate('/forgot-password')}>Redefina sua senha</span>
         </p>
         <p className="text-center mt-2 text-sm text-gray-600">
-          Não tem uma conta?{' '}
-          <span className="text-[#022894] cursor-pointer" onClick={() => navigate('/register')}>
-            Crie sua conta
-          </span>
+          Não tem uma conta? <span className="text-[#022894] cursor-pointer" onClick={() => navigate('/register')}>Crie sua conta</span>
         </p>
       </div>
     </div>
