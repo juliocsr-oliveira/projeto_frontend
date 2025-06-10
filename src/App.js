@@ -13,6 +13,10 @@ import WaitingRoom from './pages/WaitingRoom';
 import PlayKahoot from './pages/PlayKahoot';
 import Quiz from './pages/Quiz';
 import Ranking from './pages/Ranking';
+import TelaUsuario from './pages/TelaUsuario'; 
+import InserirCodigoSala from './pages/InserirCodigoSala';
+import InserirNome from './pages/InserirNome';
+import GerarSala from './pages/GerarSala';
 import './index.css';
 
 function App() {
@@ -48,6 +52,10 @@ function App() {
         <Route path='/game-room' element={<GameRoom user={user} />} />
         <Route path='/quiz' element={<Quiz user={user} />} />
         <Route path='/ranking' element={<Ranking user={user} />} />
+        <Route path='/tela-usuario' element={<TelaUsuario user={user} />} />
+        <Route path='/inserir-codigo-sala' element={<InserirCodigoSala />} />
+        <Route path='/inserir-nome' element={<InserirNome />} />
+        <Route path='/gerar-sala' element={<GerarSala />} />
       </Routes>
     </Router>
   );
