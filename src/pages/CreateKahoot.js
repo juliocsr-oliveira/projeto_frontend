@@ -91,7 +91,7 @@ const CriarGabQuiz = ({ user }) => {
     }
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/quizzes/', {
+      const response = await axios.post('http://127.0.0.1:8000/api/create/', {
         titulo: quizTitle,
         usuario: userId,
         perguntas: questions.map(q => ({

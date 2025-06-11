@@ -1,40 +1,41 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../components/axiosInstance'; // uso correto
 
 const Login = ({ setUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  const handleError = (error) => {
+    if (error.response) {
+      console.error('Erro na resposta do servidor:', error.response.data);
+      alert(`Erro ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+    } else if (error.request) {
+      console.error('Erro na requisição, sem resposta:', error.request);
+      alert('Erro: nenhuma resposta do servidor. Verifique sua conexão.');
+    } else {
+      console.error('Erro ao configurar requisição:', error.message);
+      alert(`Erro inesperado: ${error.message}`);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // 1. Login (token JWT)
-      const response = await axios.post('http://127.0.0.1:8000/api/account/login/', { username, password });
+      const response = await axiosInstance.post('/api/login/', { username, password });
 
       localStorage.setItem('access', response.data.access);
       localStorage.setItem('refresh', response.data.refresh);
 
-      // 2. Busca do usuário logado com token
-      const userRes = await axios.get('http://127.0.0.1:8000/api/auth/user/', {
+      const userResponse = await axiosInstance.get('/api/auth/user/', {
         headers: { Authorization: `Bearer ${response.data.access}` }
       });
 
-      const userData = userRes.data;
-      console.log("✅ Usuário carregado:", userData);
-
-      if (!userData.id) {
-        alert('Erro: usuário logado sem ID. Verifique o back-end.');
-        return;
-      }
-
-      setUser(userData);
-      navigate('/tela_usuario'); // Corrigido para underscore se for assim no seu routes
-
+      setUser(userResponse.data);
+      navigate('/tela-usuario');
     } catch (error) {
-      alert('Erro ao fazer login! Verifique suas credenciais.');
-      console.error('Erro no login:', error);
+      handleError(error); // usar a função de tratamento que você já criou
     }
   };
 
