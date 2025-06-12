@@ -8,13 +8,13 @@ const CriarGabQuiz = ({ user }) => {
   const [quizTitle, setQuizTitle] = useState('');
   const [questions, setQuestions] = useState([{
     text: '',
-    type: 'trueFalse',
+    type: 'VF',
     difficulty: 'facil',
     points: 100,
     options: ['', '', '', ''],
     expanded: true
   }]);
-  const [token, setToken] = useState(null);
+  const [, setToken] = useState(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('access');
@@ -41,7 +41,7 @@ const CriarGabQuiz = ({ user }) => {
     }
     setQuestions([...questions, {
       text: '',
-      type: 'trueFalse',
+      type: 'VF',
       difficulty: 'facil',
       points: 100,
       options: ['', '', '', ''],
@@ -56,7 +56,7 @@ const CriarGabQuiz = ({ user }) => {
   };
 
   const toggleType = (index) => {
-    const types = ['trueFalse', 'multiple', 'dragDrop'];
+    const types = ['trueFalse', 'MC'];
     const current = questions[index].type;
     const next = types[(types.indexOf(current) + 1) % types.length];
     handleChange(index, 'type', next);
@@ -104,7 +104,7 @@ const CriarGabQuiz = ({ user }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Quiz criado com sucesso:', response.data);
-      navigate('/');
+      navigate('/tela-jogar', { state: { quizId: response.data.id } });
     } catch (error) {
       console.error('Erro ao criar GabQuiz:', error);
       alert('Erro ao criar quiz. Verifique os dados.');
@@ -132,7 +132,7 @@ const CriarGabQuiz = ({ user }) => {
                   <input type="text" placeholder="Digite sua pergunta" value={question.text} onChange={(e) => handleChange(index, 'text', e.target.value)} className="w-full p-2 border rounded-lg mt-2" required />
 
                   <div className="flex gap-4 mt-2">
-                    <button type="button" onClick={() => toggleType(index)} className="bg-[#022894] text-white px-4 py-2 rounded">{question.type === 'trueFalse' ? 'Verdadeiro ou Falso' : question.type === 'multiple' ? 'Múltipla Escolha' : 'Escolha e Arraste'}</button>
+                    <button type="button" onClick={() => toggleType(index)} className="bg-[#022894] text-white px-4 py-2 rounded">{question.type === 'VF' ? 'Verdadeiro ou Falso' : question.type === 'multiple' ? 'Múltipla Escolha' : 'Escolha e Arraste'}</button>
                     <button type="button" onClick={() => toggleDifficulty(index)} className="bg-[#022894] text-white px-4 py-2 rounded">{question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}</button>
                   </div>
 
