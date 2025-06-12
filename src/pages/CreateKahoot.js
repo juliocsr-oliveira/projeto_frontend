@@ -12,6 +12,7 @@ const CriarGabQuiz = ({ user }) => {
     difficulty: 'facil',
     points: 100,
     options: ['', '', '', ''],
+    respostas: ['', ''],
     expanded: true
   }]);
   const [, setToken] = useState(null);
@@ -45,6 +46,7 @@ const CriarGabQuiz = ({ user }) => {
       difficulty: 'facil',
       points: 100,
       options: ['', '', '', ''],
+      respostas: ['', ''],
       expanded: true
     }]);
   };
@@ -55,11 +57,19 @@ const CriarGabQuiz = ({ user }) => {
     setQuestions(updatedQuestions);
   };
 
+  const handleRespostaChange = (qIndex, rIndex, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[qIndex].respostas[rIndex] = value;
+    setQuestions(updatedQuestions);
+  };
+
   const toggleType = (index) => {
-    const types = ['trueFalse', 'MC'];
+    const types = ['VF', 'MC'];
     const current = questions[index].type;
     const next = types[(types.indexOf(current) + 1) % types.length];
+    const respostas = next === 'VF' ? ['', ''] : ['', '', '', ''];
     handleChange(index, 'type', next);
+    handleChange(index, 'respostas', respostas);
   };
 
   const toggleDifficulty = (index) => {
@@ -98,7 +108,8 @@ const CriarGabQuiz = ({ user }) => {
           texto: q.text,
           tipo: q.type,
           dificuldade: q.difficulty,
-          pontuacao: q.points
+          pontuacao: q.points,
+          respostas: q.respostas.map((r, i) => ({ texto: r, correta: i === 0 }))
         }))
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -132,11 +143,26 @@ const CriarGabQuiz = ({ user }) => {
                   <input type="text" placeholder="Digite sua pergunta" value={question.text} onChange={(e) => handleChange(index, 'text', e.target.value)} className="w-full p-2 border rounded-lg mt-2" required />
 
                   <div className="flex gap-4 mt-2">
-                    <button type="button" onClick={() => toggleType(index)} className="bg-[#022894] text-white px-4 py-2 rounded">{question.type === 'VF' ? 'Verdadeiro ou Falso' : question.type === 'multiple' ? 'Múltipla Escolha' : 'Escolha e Arraste'}</button>
+                    <button type="button" onClick={() => toggleType(index)} className="bg-[#022894] text-white px-4 py-2 rounded">{question.type === 'VF' ? 'Verdadeiro ou Falso' : 'Múltipla Escolha'}</button>
                     <button type="button" onClick={() => toggleDifficulty(index)} className="bg-[#022894] text-white px-4 py-2 rounded">{question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}</button>
                   </div>
 
                   <input type="number" value={question.points} onChange={(e) => handleChange(index, 'points', parseInt(e.target.value))} className="w-full mt-2 p-2 border rounded-lg" placeholder="Pontuação da pergunta (ex: 100)" required />
+
+                  <div className="mt-4">
+                    <p className="mb-2 font-semibold">Respostas:</p>
+                    {question.respostas.map((resposta, rIndex) => (
+                      <input
+                        key={rIndex}
+                        type="text"
+                        value={resposta}
+                        onChange={(e) => handleRespostaChange(index, rIndex, e.target.value)}
+                        className="w-full p-2 border rounded-lg mb-2"
+                        placeholder={`Resposta ${rIndex + 1}`}
+                        required
+                      />
+                    ))}
+                  </div>
                 </>
               )}
             </div>
